@@ -16,10 +16,10 @@ function createFeatures(earthquakeData, plateData) {
                         magColor = "green";}
                 else {
                         magColor = "blue";}
-                return L.circleMarker(latlng, {radius:feature.properties.mag*4, color:"black", fillColor:magColor, fillOpacity:.65})
+                return L.circleMarker(latlng, {radius:feature.properties.mag*4, color:"black", opacity:0, fillColor:magColor, fillOpacity:.5})
                         .bindPopup("<h3>" + feature.properties.place + 
                                 "</h3><hr><p>" + new Date(feature.properties.time) + 
-                                "</p>" + "</h3><hr><p>Magnitude: " + feature.properties.mag + "</p>")
+                                "</p>" + "</h3><hr><p>Magnitude: " + feature.properties.mag + "</p>");
         }
     });
 
@@ -73,7 +73,7 @@ function createMap(earthquakes, tectonicPlates) {
     const myMap = L.map("map", {
             center: [37, -114],
             zoom: 4,
-            layers: [darkmap, earthquakes, tectonicPlates]
+            layers: [darkmap, tectonicPlates]
     });
 
     // Create a layer control
