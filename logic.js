@@ -1,8 +1,9 @@
 function createFeatures(earthquakeData, plateData) {
 
-    // Create a GeoJSON layer containing the features array on the earthquakeData object
+    // Create a GeoJSON layer from earthquakeData object features
     const earthquakes = L.geoJSON(earthquakeData, {
         pointToLayer: function (feature, latlng) {
+                // Set circle color based on mag
                 var magColor = ""
                 if (feature.properties.mag > 5) {
                         magColor = "red";}
@@ -16,7 +17,8 @@ function createFeatures(earthquakeData, plateData) {
                         magColor = "green";}
                 else {
                         magColor = "blue";}
-                return L.circleMarker(latlng, {radius:feature.properties.mag*4, color:"black", opacity:0, fillColor:magColor, fillOpacity:.5})
+                // Plot each earthquake with a circle
+                return L.circleMarker(latlng, {radius:feature.properties.mag*3, color:"black", opacity:0, fillColor:magColor, fillOpacity:.5})
                         .bindPopup("<h3>" + feature.properties.place + 
                                 "</h3><hr><p>" + new Date(feature.properties.time) + 
                                 "</p>" + "</h3><hr><p>Magnitude: " + feature.properties.mag + "</p>");
@@ -29,20 +31,19 @@ function createFeatures(earthquakeData, plateData) {
         weight: 2
     };
 
-    // Create a GeoJSON layer containing the features array on the earthquakeData object
-    // Run the onEachFeature function once for each piece of data in the array
+    // Create a GeoJSON layer from plateData object features
     const tectonicPlates = L.geoJSON(plateData, {
         style: plateStyle
     });
 
 
-    // Sending our earthquakes layer to the createMap function
+    // Send earthquakes and tectonicPlates layers to createMap function
     createMap(earthquakes, tectonicPlates);
 }
 
 function createMap(earthquakes, tectonicPlates) {
 
-    // Define streetmap and darkmap layers
+    // Define lightmap and darkmap layers
     const lightmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
             attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
             maxZoom: 18,
@@ -57,19 +58,19 @@ function createMap(earthquakes, tectonicPlates) {
             accessToken: API_KEY
     });
 
-    // Define a baseMaps object to hold our base layers
+    // baseMaps object for base layers
     const baseMaps = {
             "Light Map": lightmap,
             "Dark Map": darkmap
     };
 
-    // Create overlay object to hold our overlay layer
+    // Object for overlay
     const overlayMaps = {
             "Earthquakes": earthquakes,
             "Tectonic Plates": tectonicPlates
     };
 
-    // Create our map, giving it the streetmap and earthquakes layers to display on load
+    // Create the map, setting it to darkmap and fault line layers to display 
     const myMap = L.map("map", {
             center: [37, -114],
             zoom: 4,
@@ -77,8 +78,8 @@ function createMap(earthquakes, tectonicPlates) {
     });
 
     // Create a layer control
-    // Pass in our baseMaps and overlayMaps
-    // Add the layer control to the map
+    // Pass baseMaps and overlayMaps
+    // Add layer control to map
     L.control.layers(baseMaps, overlayMaps, {
             collapsed: false
     }).addTo(myMap);
@@ -89,6 +90,6 @@ function createMap(earthquakes, tectonicPlates) {
     const plateURL = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_plates.json";
     const quakeData = await d3.json(earthquakeURL);
     const plateData = await d3.json(plateURL);
-    // Once we get a response, send the data.features object to the createFeatures function
+    // When program gets response, pass quakeData.features and plateData objects to createFeatures function
     createFeatures(quakeData.features, plateData);
 })()
